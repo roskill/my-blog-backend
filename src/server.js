@@ -1,9 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { MongoClient } from 'mongodb';
+import path from 'path';
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, '/build'))); // tells server where to serve static files from
 app.use(bodyParser.json());
 
 // app.get('/hello', (req, res) => res.send('Hello'));
@@ -75,6 +77,11 @@ app.post('/api/articles/:name/add-comment', async (req, res) => {
       .findOne({ name: articleName });
     res.status(200).json(updatedArticleInfo);
   }, res);
+});
+
+// requests not caught by the above api routes will be passed onto the app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname + '/build/index.html'));
 });
 
 app.listen(8000, () => console.log('Listening on port 8000'));
